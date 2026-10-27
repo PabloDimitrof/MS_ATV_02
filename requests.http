@@ -1,0 +1,52 @@
+### Requisições de teste (extensão REST Client do VSCode: clique em "Send Request")
+### Operadores: manutencao/manutencao (ROLE_MANUTENCAO) e admin/admin (ROLE_ADMIN)
+
+### 1. Login válido -> 200
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{ "username": "maria", "senha": "abc123" }
+
+### 2. Login inválido (rodar 2x para bloquear o joao) -> 401
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{ "username": "joao", "senha": "errada" }
+
+### 3. Mesmo com a senha certa, joao bloqueado -> 401
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{ "username": "joao", "senha": "123456" }
+
+### 4. Desbloquear com manutencao -> 403 (não é admin)
+PUT http://localhost:8080/unlock/joao
+Authorization: Basic manutencao manutencao
+
+### 5. Desbloquear com admin -> 200
+PUT http://localhost:8080/unlock/joao
+Authorization: Basic admin admin
+
+### 6. Trocar senha -> 200
+PUT http://localhost:8080/trocarsenha/pedro
+Content-Type: application/json
+
+{ "atual": "senha1", "nova": "nova1" }
+
+### 7. Listar usuários (ROLE_MANUTENCAO) -> 200
+GET http://localhost:8080/
+Authorization: Basic manutencao manutencao
+
+### 8. Listar usuários com admin -> 403
+GET http://localhost:8080/
+Authorization: Basic admin admin
+
+### 9. Cadastrar usuário (ROLE_MANUTENCAO) -> 201
+POST http://localhost:8080/
+Authorization: Basic manutencao manutencao
+Content-Type: application/json
+
+{ "username": "carla", "senha": "c4rla" }
+
+### 10. Métricas para o Prometheus
+GET http://localhost:8080/actuator/prometheus

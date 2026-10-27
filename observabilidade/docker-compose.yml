@@ -1,0 +1,25 @@
+# Sobe Prometheus (9090) e Grafana (3000) ja configurados.
+# Uso: dentro desta pasta, rodar "docker compose up -d"
+services:
+
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana-oss:13.0.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      # datasource do Prometheus + dashboard criados automaticamente
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
